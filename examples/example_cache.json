@@ -1,0 +1,16 @@
+{
+  "0": {
+    "question": "What color is the car?\nNOTE: Provide only the final answer. Do not provide unrelated details.",
+    "gt_ans": "red",
+    "ans": "The car is red.",
+    "generated_ids": [[450, 8942, 29889]],
+    "label": true
+  },
+  "1": {
+    "question": "How many dogs are visible?\nNOTE: Provide only the final answer. Do not provide unrelated details.",
+    "gt_ans": "2",
+    "ans": "3",
+    "generated_ids": [[467, 2871, 29889]],
+    "label": false
+  }
+}

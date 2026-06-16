@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Outputs
+outputs/
+logs/
+*.log
+nohup.out
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Generated answer caches (large)
+cache/
