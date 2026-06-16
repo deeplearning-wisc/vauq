@@ -42,7 +42,7 @@ def compute_vauq_scores(
     Returns:
         entropy_org: predictive entropy H(Y|X,V)
         is_score: Image-Information Score (PMI under core masking)
-        vauq: combined score = alpha * IS - entropy (higher => more likely correct)
+        vauq: uncertainty score = H - alpha * IS (lower => more likely correct)
     """
     entropy_org = compute_entropy(lvlm, image, question, generated_ids)
     entropy_masked = compute_entropy_core_masked(
@@ -50,7 +50,7 @@ def compute_vauq_scores(
     )
 
     is_score = entropy_masked - entropy_org
-    vauq = alpha * is_score - entropy_org
+    vauq = entropy_org - alpha * is_score
 
     return {
         "entropy": entropy_org,

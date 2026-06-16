@@ -239,7 +239,7 @@ def evaluate(args):
 
         if entry.get("label") is not None:
             y_true.append(int(entry["label"]))
-            vauq_scores.append(scores["vauq"])
+            vauq_scores.append(-scores["vauq"])
             entropy_scores.append(-scores["entropy"])
             is_scores.append(scores["is_score"])
 

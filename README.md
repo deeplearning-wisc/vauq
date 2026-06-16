@@ -6,10 +6,10 @@ VAUQ is a **training-free** uncertainty score for large vision-language models. 
 1. **Predictive entropy** — standard token-level uncertainty of the generated answer.
 2. **Image-Information Score (IS)** — how much uncertainty increases when salient vision tokens are masked (core-region masking via attention).
 
-Final score (higher ⇒ more likely correct):
+Final score (lower ⇒ more likely correct):
 
 ```
-VAUQ = α · IS − H(Y|X,V)
+VAUQ = H(Y|X,V) − α · IS
 IS   = H(Y|X,V_masked) − H(Y|X,V)
 ```
 
@@ -113,6 +113,3 @@ VAUQ/
 }
 ```
 
-## License
-
-This project is released for research purposes. LLaVA weights are subject to the [LLaVA license](https://github.com/haotian-liu/LLaVA); benchmark datasets follow their respective licenses on Hugging Face.
