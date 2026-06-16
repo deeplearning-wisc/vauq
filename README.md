@@ -46,17 +46,6 @@ CUDA_VISIBLE_DEVICES=0 python run_vauq.py --benchmark MMVet --max_samples 10
 
 Results are written to `outputs/` as JSON, including per-sample VAUQ scores. AUROC/AUPR are computed only when you supply correctness labels (see below).
 
-## Hyperparameters
-
-If omitted, `--topk_ratio` and `--alpha` use the **benchmark defaults** for LLaVA 1.5 7B (`DEFAULT_HYPERPARAMETERS` in `run_vauq.py`):
-
-| Benchmark | topk_ratio | α   | layer_range (default) |
-|-----------|------------|-----|------------------------|
-| MMVet     | 0.4        | 0.6 | [10, 25)               |
-| CVBench   | 0.1        | 1.5 | [10, 25)               |
-| VILP      | 1.0        | 0.6 | [10, 25)               |
-
-Layer range defaults: `--layer_start 10`, `--layer_end 25`.
 
 ## Answer cache and labeling
 
