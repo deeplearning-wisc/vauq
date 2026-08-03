@@ -88,7 +88,6 @@ VAUQ/
 ├── lvlm/                # LLaVA 1.5, Qwen2.5-VL, InternVL3.5 wrappers
 ├── vauq/scoring.py      # Entropy, IS, and VAUQ score
 ├── benchmark/           # MM-Vet, CV-Bench, ViLP & VisualCoT loaders
-├── data/                # Labeled answer caches for reproduction
 └── metrics.py           # Token-level entropy
 ```
 
