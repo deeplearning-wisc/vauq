@@ -10,3 +10,6 @@ accelerate>=0.27.0
 huggingface_hub>=0.20.0
 pandas>=2.0.0
 pyarrow>=14.0.0
+
+# Qwen2.5-VL only
+qwen-vl-utils>=0.0.8

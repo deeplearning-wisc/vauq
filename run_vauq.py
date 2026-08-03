@@ -19,17 +19,29 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 from tqdm import tqdm
 
 from benchmark import BENCHMARK_MAP
-from lvlm.llava import LLaVA
 from utils.misc import get_cur_time
 from vauq.scoring import compute_vauq_scores
 
-DEFAULT_HYPERPARAMETERS = {
-    "llava-1.5-7b-hf": {
-        "MMVet": {"topk_ratio": 0.4, "alpha": 0.6},
-        "CVBench": {"topk_ratio": 0.1, "alpha": 1.5},
-        "VILP": {"topk_ratio": 1.0, "alpha": 0.6},
-    },
+# model id -> (module, class). Wrappers are imported lazily so optional deps
+# (e.g. qwen-vl-utils) are only required when that model is selected.
+MODEL_MAP = {
+    "llava-1.5-7b-hf": ("lvlm.llava", "LLaVA"),
+    "llava-1.5-13b-hf": ("lvlm.llava", "LLaVA"),
+    "Qwen2.5-VL-7B-Instruct": ("lvlm.qwen25vl", "Qwen25VL"),
+    "InternVL3_5-8B": ("lvlm.internvl", "InternVL3"),
 }
+
+
+def build_lvlm(model_id):
+    import importlib
+
+    if model_id not in MODEL_MAP:
+        raise SystemExit(
+            f"Unsupported model '{model_id}'. Choices: {list(MODEL_MAP)}"
+        )
+    module_name, class_name = MODEL_MAP[model_id]
+    module = importlib.import_module(module_name)
+    return getattr(module, class_name)(version=model_id)
 
 
 def parse_args():
@@ -38,7 +50,8 @@ def parse_args():
         "--model",
         type=str,
         default="llava-1.5-7b-hf",
-        help="HuggingFace model id suffix (llava-hf/<model>)",
+        choices=list(MODEL_MAP.keys()),
+        help="LVLM to evaluate",
     )
     parser.add_argument(
         "--benchmark",
@@ -74,13 +87,13 @@ def parse_args():
         "--topk_ratio",
         type=float,
         default=None,
-        help="Fraction of salient vision tokens to mask (default: benchmark default)",
+        help="Fraction of salient vision tokens to mask (required for scoring)",
     )
     parser.add_argument(
         "--alpha",
         type=float,
         default=None,
-        help="Weight for Image-Information Score (default: benchmark default)",
+        help="Weight for Image-Information Score (required for scoring)",
     )
     parser.add_argument(
         "--layer_start",
@@ -107,23 +120,12 @@ def fix_seed(seed):
 
 
 def resolve_scoring_params(args):
-    defaults = DEFAULT_HYPERPARAMETERS.get(args.model, {}).get(args.benchmark)
-    if defaults is None:
-        raise SystemExit(
-            f"Error: no default hyperparameters for model={args.model}, "
-            f"benchmark={args.benchmark}. Pass --topk_ratio and --alpha explicitly."
-        )
-
-    topk_ratio = args.topk_ratio if args.topk_ratio is not None else defaults["topk_ratio"]
-    alpha = args.alpha if args.alpha is not None else defaults["alpha"]
-
     if args.topk_ratio is None or args.alpha is None:
-        print(
-            f"Using defaults for {args.benchmark}: "
-            f"topk_ratio={topk_ratio}, alpha={alpha}"
+        raise SystemExit(
+            "Error: --topk_ratio and --alpha are required for scoring "
+            "(e.g. --topk_ratio 0.3 --alpha 0.9)."
         )
-
-    return topk_ratio, alpha, [args.layer_start, args.layer_end]
+    return args.topk_ratio, args.alpha, [args.layer_start, args.layer_end]
 
 
 def default_cache_path(args):
@@ -180,7 +182,7 @@ def evaluate(args):
     fix_seed(args.seed)
 
     print(f"Loading {args.model} ...")
-    lvlm = LLaVA(version=args.model)
+    lvlm = build_lvlm(args.model)
 
     benchmark_cls = BENCHMARK_MAP[args.benchmark]
     benchmark = benchmark_cls()

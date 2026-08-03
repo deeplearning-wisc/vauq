@@ -31,25 +31,14 @@ You need a CUDA GPU (~16 GB VRAM for LLaVA 1.5 7B). Models and datasets are down
 # Generate answers
 python run_vauq.py --benchmark MMVet --generate_only
 
-# Run VAUQ (uses benchmark defaults for topk_ratio and alpha)
-python run_vauq.py --benchmark MMVet
-./run.sh MMVet
-./run.sh CVBench
-./run.sh VILP
+# Run VAUQ (topk_ratio and alpha are required)
+python run_vauq.py --benchmark MMVet --topk_ratio [K] --alpha [alpha]
+./run.sh MMVet [K] [alpha]
+./run.sh CVBench [K] [alpha]
+./run.sh VILP [K] [alpha]
 
-# Override hyperparameters
-python run_vauq.py --benchmark MMVet --topk_ratio 0.5 --alpha 0.8
-
-# Smoke test
-CUDA_VISIBLE_DEVICES=0 python run_vauq.py --benchmark MMVet --max_samples 10
-```
 
 Results are written to `outputs/` as JSON, including per-sample VAUQ scores. AUROC/AUPR are computed only when you supply correctness labels (see below).
-
-
-## Answer cache and labeling
-
-This repo **does not** auto-label responses. VAUQ scoring only needs `ans` and `generated_ids`; AUROC/AUPR need a boolean `label` per sample that you provide (e.g. via your own LLM judge API, exact match, or human review).
 
 **Step 1 — generate answers**
 
@@ -96,9 +85,10 @@ Re-runs reuse the labeled cache so you can ablate hyperparameters without re-gen
 VAUQ/
 ├── run_vauq.py          # Main evaluation script
 ├── run.sh               # Convenience launcher
-├── lvlm/llava.py        # LLaVA 1.5 + core attention masking
+├── lvlm/                # LLaVA 1.5, Qwen2.5-VL, InternVL3.5 wrappers
 ├── vauq/scoring.py      # Entropy, IS, and VAUQ score
-├── benchmark/           # MM-Vet, CV-Bench & ViLP loaders
+├── benchmark/           # MM-Vet, CV-Bench, ViLP & VisualCoT loaders
+├── data/                # Labeled answer caches for reproduction
 └── metrics.py           # Token-level entropy
 ```
 
